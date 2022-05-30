@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/joho/godotenv v1.4.0
 	github.com/labstack/echo/v4 v4.7.2
+	github.com/lib/pq v1.10.6
 	github.com/zmb3/spotify/v2 v2.2.0
 	golang.org/x/oauth2 v0.0.0-20210810183815-faf39c7919d5
 )

@@ -1,12 +1,11 @@
 package controllers
 
 import (
-	"context"
+	"github.com/RubenPari/playlist_with_all_artists/database"
+	"github.com/RubenPari/playlist_with_all_artists/utils"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/zmb3/spotify/v2"
-	spotifyauth "github.com/zmb3/spotify/v2/auth"
-	"golang.org/x/oauth2/clientcredentials"
 	"log"
 	"os"
 )
@@ -16,30 +15,33 @@ func UpdatePlaylist(c echo.Context) error {
 
 	userId := os.Getenv("USER_ID")
 
-	ctx := context.Background()
+	client, ctx := utils.GetSpotifyClientCtx()
 
-	config := &clientcredentials.Config{
-		ClientID:     os.Getenv("CLIENT_ID"),
-		ClientSecret: os.Getenv("CLIENT_SECRET"),
-		TokenURL:     "https://accounts.spotify.com/api/token",
-	}
-
-	token, err := config.Token(ctx)
-	if err != nil {
-		log.Fatalf("couldn't get token: %v", err)
-	}
-
-	httpClient := spotifyauth.New().Client(ctx, token)
-
-	client := spotify.New(httpClient)
-
+	// get all playlist of the user logged
 	playlists, errPlaylists := client.GetPlaylistsForUser(ctx, userId)
 	if errPlaylists != nil {
 		log.Fatalf("couldn't get playlists: %v", errPlaylists)
 	}
 
-	return c.JSON(200, map[string]interface{}{
-		"status":    "success",
-		"playlists": playlists,
-	})
+	// get specific playlist id
+	var idPlaylist spotify.ID
+
+	for i := 0; i < len(playlists.Playlists); i++ {
+		if playlists.Playlists[i].Name == os.Getenv("PLAYLIST_NAME") {
+			idPlaylist = playlists.Playlists[i].ID
+			break
+		}
+	}
+
+	// TODO: continue... get all tracks and add the to playlist
+
+	return c.JSON(200, idPlaylist)
+}
+
+// GetAllTracks
+// Get all tracks for every artist saved in the db
+func GetAllTracks(idPlaylist spotify.ID) error {
+	client, ctx := utils.GetSpotifyClientCtx()
+	db := database.GetDatabase()
+
 }
