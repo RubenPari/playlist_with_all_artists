@@ -78,15 +78,22 @@ func InsertArtist(artist models.Artist) bool {
 	}
 }
 
-func DeleteArtist(artist models.Artist) {
+func DeleteArtist(artist models.Artist) bool {
 	db := GetDatabase()
 	defer func(db *sql.DB) {
 		_ = db.Close()
 	}(db)
 
-	_, err := db.Exec("DELETE FROM artists WHERE id = $1", artist.Id)
+	res, err := db.Exec("DELETE FROM artists WHERE id = $1", artist.Id)
 	if err != nil {
 		panic(err)
+	}
+
+	result, _ := res.RowsAffected()
+	if result == 1 {
+		return true
+	} else {
+		return false
 	}
 }
 
@@ -96,11 +103,14 @@ func CheckIfArtistExists(artist models.Artist) bool {
 		_ = db.Close()
 	}(db)
 
-	var id int
+	var id = 0
 	err := db.QueryRow("SELECT id FROM artists WHERE spotify_id = $1", artist.SpotifyId).Scan(&id)
 	if err != nil {
 		return false
 	}
-
-	return true
+	if id != 0 {
+		return true
+	} else {
+		return false
+	}
 }
