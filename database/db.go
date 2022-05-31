@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"github.com/RubenPari/playlist_with_all_artists/models"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"os"
@@ -18,7 +19,7 @@ func GetDatabase() *sql.DB {
 	dbname := os.Getenv("DB_NAME")
 
 	// connection string
-	pSqlConn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	pSqlConn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 
 	db, err := sql.Open("postgres", pSqlConn)
 	if err != nil {
@@ -26,4 +27,76 @@ func GetDatabase() *sql.DB {
 	}
 
 	return db
+}
+
+func GetAllArtists() []models.Artist {
+	db := GetDatabase()
+	defer func(db *sql.DB) {
+		_ = db.Close()
+	}(db)
+
+	rows, err := db.Query("SELECT * FROM artists")
+	if err != nil {
+		panic(err)
+	}
+
+	var artists []models.Artist
+
+	for rows.Next() {
+		var id int
+		var spotifyId string
+		var name string
+
+		err = rows.Scan(&id, &spotifyId, &name)
+		if err != nil {
+			panic(err)
+		}
+
+		artists = append(artists, models.Artist{
+			Id:        id,
+			SpotifyId: spotifyId,
+			Name:      name,
+		})
+	}
+
+	return artists
+}
+
+func InsertArtist(artist models.Artist) {
+	db := GetDatabase()
+	defer func(db *sql.DB) {
+		_ = db.Close()
+	}(db)
+
+	_, err := db.Exec("INSERT INTO artists (spotify_id, name) VALUES ($1, $2)", artist.SpotifyId, artist.Name)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func DeleteArtist(artist models.Artist) {
+	db := GetDatabase()
+	defer func(db *sql.DB) {
+		_ = db.Close()
+	}(db)
+
+	_, err := db.Exec("DELETE FROM artists WHERE id = $1", artist.Id)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func CheckIfArtistExists(artist models.Artist) bool {
+	db := GetDatabase()
+	defer func(db *sql.DB) {
+		_ = db.Close()
+	}(db)
+
+	var id int
+	err := db.QueryRow("SELECT id FROM artists WHERE spotify_id = $1", artist.SpotifyId).Scan(&id)
+	if err != nil {
+		return false
+	}
+
+	return true
 }
