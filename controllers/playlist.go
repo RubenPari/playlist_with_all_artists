@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"github.com/RubenPari/playlist_with_all_artists/database"
 	"github.com/RubenPari/playlist_with_all_artists/utils"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
@@ -40,8 +39,7 @@ func UpdatePlaylist(c echo.Context) error {
 
 // GetAllTracks
 // Get all tracks for every artist saved in the db
-func GetAllTracks(idPlaylist spotify.ID) error {
-	client, ctx := utils.GetSpotifyClientCtx()
-	db := database.GetDatabase()
-
+func GetAllTracks(idPlaylist spotify.ID) {
+	//client, ctx := utils.GetSpotifyClientCtx()
+	//db := database.GetDatabase()
 }

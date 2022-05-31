@@ -9,6 +9,7 @@ func main() {
 	var e = echo.New()
 
 	routes.SetUpPlaylistRoutes(e)
+	routes.SetUpArtistRoutes(e)
 
 	e.Logger.Fatal(e.Start(":3000"))
 }

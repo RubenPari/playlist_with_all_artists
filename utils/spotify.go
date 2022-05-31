@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"github.com/joho/godotenv"
 	"github.com/zmb3/spotify/v2"
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
 	"golang.org/x/oauth2/clientcredentials"
@@ -10,6 +11,8 @@ import (
 )
 
 func GetSpotifyClientCtx() (*spotify.Client, context.Context) {
+	_ = godotenv.Load()
+
 	ctx := context.Background()
 
 	config := &clientcredentials.Config{

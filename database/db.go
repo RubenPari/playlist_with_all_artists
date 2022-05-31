@@ -2,24 +2,24 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/RubenPari/playlist_with_all_artists/models"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-	"os"
+	"github.com/zmb3/spotify/v2"
 )
 
 func GetDatabase() *sql.DB {
 	_ = godotenv.Load()
 
-	host := os.Getenv("DB_HOST")
-	port := os.Getenv("DB_PORT")
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWORD")
-	dbname := os.Getenv("DB_NAME")
+	//host := os.Getenv("DB_HOST")
+	//port, _ := strconv.Atoi(os.Getenv("DB_PORT"))
+	//user := os.Getenv("DB_USER")
+	//password := os.Getenv("DB_PASSWORD")
+	//dbname := os.Getenv("DB_NAME")
 
 	// connection string
-	pSqlConn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	//pSqlConn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	pSqlConn := "postgresql://doadmin:show-password@playlist-do-user-10671938-0.b.db.ondigitalocean.com:25060/playlist?sslmode=require"
 
 	db, err := sql.Open("postgres", pSqlConn)
 	if err != nil {
@@ -44,7 +44,7 @@ func GetAllArtists() []models.Artist {
 
 	for rows.Next() {
 		var id int
-		var spotifyId string
+		var spotifyId spotify.ID
 		var name string
 
 		err = rows.Scan(&id, &spotifyId, &name)
@@ -62,15 +62,20 @@ func GetAllArtists() []models.Artist {
 	return artists
 }
 
-func InsertArtist(artist models.Artist) {
+func InsertArtist(artist models.Artist) bool {
 	db := GetDatabase()
 	defer func(db *sql.DB) {
 		_ = db.Close()
 	}(db)
 
-	_, err := db.Exec("INSERT INTO artists (spotify_id, name) VALUES ($1, $2)", artist.SpotifyId, artist.Name)
+	res, err := db.Exec("INSERT INTO artists (spotify_id, name) VALUES ($1, $2)", artist.SpotifyId, artist.Name)
 	if err != nil {
 		panic(err)
+	}
+	if res != nil {
+		return true
+	} else {
+		return false
 	}
 }
 
