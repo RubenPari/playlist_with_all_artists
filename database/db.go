@@ -19,8 +19,7 @@ func GetDatabase() *sql.DB {
 
 	// connection string
 	//pSqlConn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-	pSqlConn := "postgresql://doadmin:show-password@playlist-do-user-10671938-0.b.db.ondigitalocean.com:25060/playlist?sslmode=require"
-
+	pSqlConn := "postgresql://doadmin:AVNS_ZfCTZ4BWfndxI5L@playlist-do-user-10671938-0.b.db.ondigitalocean.com:25060/playlist?sslmode=require"
 	db, err := sql.Open("postgres", pSqlConn)
 	if err != nil {
 		panic(err)
