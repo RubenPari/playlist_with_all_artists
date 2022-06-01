@@ -7,6 +7,7 @@ import (
 
 func SetUpArtistRoutes(e *echo.Echo) {
 	e.POST("/artist/add", controllers.Add)
+	e.GET("/artist/all", controllers.GetAll)
 	e.GET("/artist/exists", controllers.CheckIfExists)
 	e.DELETE("/artist/delete", controllers.Delete)
 }

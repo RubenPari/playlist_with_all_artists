@@ -64,6 +64,14 @@ func CheckIfExists(c echo.Context) error {
 	}
 }
 
+func GetAll(c echo.Context) error {
+	artists := database.GetAllArtists()
+
+	return c.JSON(200, map[string]interface{}{
+		"artists": artists,
+	})
+}
+
 func Delete(c echo.Context) error {
 	artistObj := getArtistObjByName(c.QueryParam("name"))
 
