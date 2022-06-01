@@ -27,7 +27,7 @@ func getArtistObjByName(name string) models.Artist {
 }
 
 func Add(c echo.Context) error {
-	artistObj := getArtistObjByName(c.Param("name"))
+	artistObj := getArtistObjByName(c.QueryParam("name"))
 
 	// insert artist in the db
 	inserted := database.InsertArtist(artistObj)
@@ -46,12 +46,12 @@ func Add(c echo.Context) error {
 }
 
 func CheckIfExists(c echo.Context) error {
-	artistObj := getArtistObjByName(c.Param("name"))
+	artistObj := getArtistObjByName(c.QueryParam("name"))
 
 	// check if artist exists in the db
-	exists := database.CheckIfArtistExists(artistObj)
+	idExists := database.CheckIfArtistExists(&artistObj)
 
-	if exists {
+	if idExists != 0 {
 		return c.JSON(200, map[string]string{
 			"status":  "ok",
 			"message": "artist exists",
@@ -65,14 +65,17 @@ func CheckIfExists(c echo.Context) error {
 }
 
 func Delete(c echo.Context) error {
-	artistObj := getArtistObjByName(c.Param("name"))
+	artistObj := getArtistObjByName(c.QueryParam("name"))
 
 	// check if artist exists in the db
-	exists := database.CheckIfArtistExists(artistObj)
+	idExists := database.CheckIfArtistExists(&artistObj)
 
-	if exists {
+	if idExists != 0 {
+		// setup id artistObj
+		artistObj.Id = idExists
+
 		// delete artist in the db
-		deleted := database.DeleteArtist(artistObj)
+		deleted := database.DeleteArtist(&artistObj)
 
 		if deleted {
 			return c.JSON(200, map[string]string{
