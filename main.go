@@ -10,6 +10,7 @@ func main() {
 
 	routes.SetUpPlaylistRoutes(e)
 	routes.SetUpArtistRoutes(e)
+	routes.SetUpUserRoutes(e)
 
 	e.Logger.Fatal(e.Start(":3000"))
 }
